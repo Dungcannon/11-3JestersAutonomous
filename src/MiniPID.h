@@ -1,11 +1,11 @@
-// YO IDK HOW THIS WORKS BUT WE BALL ANYWAYS
+
 #ifndef MINIPID_H
 #define MINIPID_H
 
 class MiniPID{
 public:
-	MiniPID(double, double, double);
-	MiniPID(double, double, double, double);
+	MiniPID(double, double, double); // var pid cant call function despite being of MiniPID,
+	MiniPID(double, double, double, double); // idk how to fix rn
 	void setP(double);
 	void setI(double);
 	void setD(double);
