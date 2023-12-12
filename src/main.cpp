@@ -164,6 +164,7 @@ task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
  
 // Allows for easier use of the VEX Library
 using namespace vex;
+// https://www.vexforum.com/t/user-control-and-autonomous/106690/5
 
 
 bool getHappy = false;
