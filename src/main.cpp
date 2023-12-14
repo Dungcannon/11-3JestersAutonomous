@@ -165,7 +165,8 @@ task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
 // Allows for easier use of the VEX Library
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
-
+pneumatics Piston2 = pneumatics(Brain.ThreeWirePort.B);
+pneumatics Piston1 = pneumatics(Brain.ThreeWirePort.A);
 
 bool getHappy = false;
 void triggerHappy(int timems){
@@ -218,9 +219,18 @@ void Forward(int x){
 void TurnTo(int x){
   Drivetrain.turnToHeading(x, degrees);
 }
-
-int main() {
+void pre_auton(void){
   calibrateDrivetrain();
-  proportionalTurnR(90); // attempts to turn right 
+  Catapult.setVelocity(100, percent); // catapult shoot speed
+  Catapult.setMaxTorque(100, percent); // catapult torque
+  Catapult.setStopping(hold);  
+}
+
+void auton(void){
+  proportionalTurnR(90); // attempts to turn right
   Forward(1000); // 1meter forward
+}
+int main() {
+  pre_auton();
+  auton();
 }
