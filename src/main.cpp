@@ -39,6 +39,8 @@ motor Catapult = motor(PORT5, ratio18_1, false);
 
 motor Frills = motor(PORT6, ratio18_1, false);
 
+digital_out Solenoid = digital_out(Brain.ThreeWirePort.A);
+
 controller Controller1 = controller(primary);
 
 void calibrateDrivetrain() {
@@ -148,15 +150,6 @@ task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
 
 #pragma endregion VEXcode Generated Robot Configuration
 
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/*    Module:       main.cpp                                                  */
-/*    Author:       {Ramos}                                                  */
-/*    Created:      {12/1}                                                    */
-/*    Description:  Testing and producing an autonomous program                                           */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
-
 // Include the V5 Library
 #include "vex.h"
 #include <math.h> 
@@ -165,8 +158,6 @@ task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
 // Allows for easier use of the VEX Library
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
-pneumatics Piston2 = pneumatics(Brain.ThreeWirePort.B);
-pneumatics Piston1 = pneumatics(Brain.ThreeWirePort.A);
 
 bool getHappy = false;
 void triggerHappy(int timems){
@@ -223,13 +214,16 @@ void pre_auton(void){
   calibrateDrivetrain();
   Catapult.setVelocity(100, percent); // catapult shoot speed
   Catapult.setMaxTorque(100, percent); // catapult torque
-  Catapult.setStopping(hold);  
+  Catapult.setStopping(hold);
+  Solenoid.set(false);  
 }
 
 void auton(void){
-  proportionalTurnR(90); // attempts to turn right
-  Forward(1000); // 1meter forward
+  
+  /*proportionalTurnR(90); // attempts to turn right
+  Forward(1000); // 1meter forward*/
 }
+
 int main() {
   pre_auton();
   auton();
