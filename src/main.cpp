@@ -160,12 +160,12 @@ using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
 
 bool getHappy = false;
-void triggerHappy(int timems){
+void TriggerHappy(int timems){
   getHappy = true;
   int i; //counter
   while (getHappy == true){
     {
-      if (i>=timems) {getHappy = false;} //if counter more than ms
+      if (i>=timems) {getHappy = false; Catapult.stop();} //if counter more than ms
       Catapult.spin(forward);
       wait(10, msec);
       i+=10;
@@ -222,6 +222,7 @@ void auton(void){
   
   /*proportionalTurnR(90); // attempts to turn right
   Forward(1000); // 1meter forward*/
+  TriggerHappy(30000); //30sec
 }
 
 int main() {
