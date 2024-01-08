@@ -39,7 +39,8 @@ motor Catapult = motor(PORT5, ratio18_1, false);
 
 motor Frills = motor(PORT6, ratio18_1, false);
 
-digital_out Solenoid = digital_out(Brain.ThreeWirePort.A);
+triport ThreeWirePort = triport(PORT22);
+digital_out Solenoid = digital_out(ThreeWirePort.A);
 
 controller Controller1 = controller(primary);
 
