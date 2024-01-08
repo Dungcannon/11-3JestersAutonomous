@@ -165,7 +165,7 @@ void TriggerHappy(int timems){
   int i; //counter
   while (getHappy == true){
     {
-      if (i>=timems) {getHappy = false; Catapult.stop();} //if counter more than ms
+      if (i>=timems) {getHappy = false; Catapult.stop(); return;} //if counter more than ms
       Catapult.spin(forward);
       wait(10, msec);
       i+=10;
