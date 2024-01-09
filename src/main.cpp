@@ -1,4 +1,4 @@
-#pragma region VEXcode Generated Robot Configuration
+
 // Make sure all required headers are included.
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,17 +14,6 @@ competition Competition;
 
 // Brain should be defined by default
 brain Brain;
-
-
-// START V5 MACROS
-#define waitUntil(condition)                                                   \
-  do {                                                                         \
-    wait(5, msec);                                                             \
-  } while (!(condition))
-
-#define repeat(iterations)                                                     \
-  for (int iterator = 0; iterator < iterations; iterator++)
-// END V5 MACROS
 
 
 // Robot configuration code.
@@ -65,11 +54,90 @@ bool Controller1RightShoulderControlMotorsStopped = true;
 bool DrivetrainLNeedsToBeStopped_Controller1 = true;
 bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 
-// define a task that will handle monitoring inputs from Controller1
-int rc_auto_loop_function_Controller1() {
-  // process the controller input every 20 milliseconds
-  // update the motors based on the input values
-  while(true) {
+
+
+
+
+// Include the V5 Library
+#include "vex.h"
+#include <math.h> 
+#include "MiniPID.h"
+ 
+// Allows for easier use of the VEX Library
+using namespace vex;
+// https://www.vexforum.com/t/user-control-and-autonomous/106690/5
+
+bool getHappy = false;
+void TriggerHappy(int timems){
+  getHappy = true;
+  int i; //counter
+  while (getHappy == true){
+    {
+      if (i>=timems) {getHappy = false; Catapult.stop(); return;} //if counter more than ms
+      Catapult.spin(forward);
+      wait(10, msec);
+      i+=10;
+    }
+  }
+}
+
+//Power ratio - convert degrees to volts.
+//PID
+/* MiniPID pid;
+pid = MiniPID(1,0,0); // for PID, needs a library */
+
+double ratio = 0.1; // temp ratio val
+void proportionalTurnR(int x){  //power ratio - convert degrees to volts
+  double destination = x;
+  double error;
+  error = destination-DrivetrainInertial.rotation(degrees);
+  LeftDriveSmart.spin(forward, error*ratio, volt);
+  RightDriveSmart.spin(reverse, error*ratio, volt);
+
+}
+void proportionalTurnL(int x){  //power ratio - convert degrees to volts
+  double destination = x;
+  double error;
+  error = destination-DrivetrainInertial.rotation(degrees);
+  LeftDriveSmart.spin(reverse, error*ratio, volt);
+  RightDriveSmart.spin(forward, error*ratio, volt);
+}
+/*void turnToP(int x){
+  //GET SENSOR
+  //SET SOME SORT TARGET
+  double output=pid.getOutput(sensor, target);
+  // do something with it 
+  delay(50);
+} base most barebones PID*/
+
+//without PID
+void Forward(int x){
+  Drivetrain.driveFor(forward, x, mm);
+  
+}
+void TurnTo(int x){
+  Drivetrain.turnToHeading(x, degrees);
+}
+void pre_auton(void){
+  calibrateDrivetrain();
+  Catapult.setVelocity(100, percent); // catapult shoot speed
+  Catapult.setMaxTorque(100, percent); // catapult torque
+  Catapult.setStopping(hold);
+  Solenoid.set(false);  
+}
+
+void autonomous(void){
+  
+  /*proportionalTurnR(90); // attempts to turn right
+  Forward(1000); // 1meter forward*/
+  // TriggerHappy(30000); //30sec
+  Catapult.spin(forward);
+  wait(5, seconds);
+  Catapult.stop();
+}
+
+void usercontrol(void){
+   while(true) {
     if(RemoteControlCodeEnabled) {
       // calculate the drivetrain motor velocities from the controller joystick axies
       // left = Axis3
@@ -142,91 +210,16 @@ int rc_auto_loop_function_Controller1() {
     // wait before repeating the process
     wait(20, msec);
   }
-  return 0;
 }
 
-task rc_auto_loop_task_Controller1(rc_auto_loop_function_Controller1);
-
-
-
-#pragma endregion VEXcode Generated Robot Configuration
-
-// Include the V5 Library
-#include "vex.h"
-#include <math.h> 
-#include "MiniPID.h"
- 
-// Allows for easier use of the VEX Library
-using namespace vex;
-// https://www.vexforum.com/t/user-control-and-autonomous/106690/5
-
-bool getHappy = false;
-void TriggerHappy(int timems){
-  getHappy = true;
-  int i; //counter
-  while (getHappy == true){
-    {
-      if (i>=timems) {getHappy = false; Catapult.stop(); return;} //if counter more than ms
-      Catapult.spin(forward);
-      wait(10, msec);
-      i+=10;
-    }
-  }
-}
-
-//Power ratio - convert degrees to volts.
-//PID
-/* MiniPID pid;
-pid = MiniPID(1,0,0); // for PID, needs a library */
-
-double ratio = 0.1; // temp ratio val
-void proportionalTurnR(int x){  //power ratio - convert degrees to volts
-  double destination = x;
-  double error;
-  error = destination-DrivetrainInertial.rotation(degrees);
-  LeftDriveSmart.spin(forward, error*ratio, volt);
-  RightDriveSmart.spin(reverse, error*ratio, volt);
-
-}
-void proportionalTurnL(int x){  //power ratio - convert degrees to volts
-  double destination = x;
-  double error;
-  error = destination-DrivetrainInertial.rotation(degrees);
-  LeftDriveSmart.spin(reverse, error*ratio, volt);
-  RightDriveSmart.spin(forward, error*ratio, volt);
-}
-/*void turnToP(int x){
-  //GET SENSOR
-  //SET SOME SORT TARGET
-  double output=pid.getOutput(sensor, target);
-  // do something with it 
-  delay(50);
-} base most barebones PID*/
-
-//without PID
-void Forward(int x){
-  Drivetrain.driveFor(forward, x, mm);
-  
-}
-void TurnTo(int x){
-  Drivetrain.turnToHeading(x, degrees);
-}
-void pre_auton(void){
-  calibrateDrivetrain();
-  Catapult.setVelocity(100, percent); // catapult shoot speed
-  Catapult.setMaxTorque(100, percent); // catapult torque
-  Catapult.setStopping(hold);
-  Solenoid.set(false);  
-}
-
-void auton(void){
-  
-  /*proportionalTurnR(90); // attempts to turn right
-  Forward(1000); // 1meter forward*/
-  TriggerHappy(30000); //30sec
-}
 
 int main() {
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+  
   pre_auton();
-  auton();
+
+  while(true){
+    wait(100, msec);
+  }
 }
