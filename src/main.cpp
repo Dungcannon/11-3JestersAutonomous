@@ -55,9 +55,6 @@ bool DrivetrainLNeedsToBeStopped_Controller1 = true;
 bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 
 
-
-
-
 // Include the V5 Library
 #include "vex.h"
 #include <math.h> 
@@ -67,18 +64,20 @@ bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
 
-bool getHappy = false;
-void TriggerHappy(int timems){
-  getHappy = true;
-  int i; //counter
-  while (getHappy == true){
-    {
-      if (i>=timems) {getHappy = false; Catapult.stop(); return;} //if counter more than ms
-      Catapult.spin(forward);
-      wait(10, msec);
-      i+=10;
-    }
-  }
+void TriggerHappy(int timems) 
+{
+  Catapult.spin(forward);
+  wait(timems, msec);
+  Catapult.stop();
+}
+
+void LockIt(){
+  LeftDriveSmart.setStopping(hold);
+  RightDriveSmart.setStopping(hold);
+}
+void UnlockIt(){
+  LeftDriveSmart.setStopping(coast);
+  RightDriveSmart.setStopping(coast);
 }
 
 //Power ratio - convert degrees to volts.
@@ -102,6 +101,7 @@ void proportionalTurnL(int x){  //power ratio - convert degrees to volts
   LeftDriveSmart.spin(reverse, error*ratio, volt);
   RightDriveSmart.spin(forward, error*ratio, volt);
 }
+
 /*void turnToP(int x){
   //GET SENSOR
   //SET SOME SORT TARGET
@@ -118,6 +118,9 @@ void Forward(int x){
 void TurnTo(int x){
   Drivetrain.turnToHeading(x, degrees);
 }
+
+//-------------------- Main Functions
+
 void pre_auton(void){
   calibrateDrivetrain();
   Catapult.setVelocity(100, percent); // catapult shoot speed
@@ -131,9 +134,11 @@ void autonomous(void){
   /*proportionalTurnR(90); // attempts to turn right
   Forward(1000); // 1meter forward*/
   // TriggerHappy(30000); //30sec
+  LockIt();
   Catapult.spin(forward);
   wait(20, seconds);
   Catapult.stop();
+  UnlockIt();
 }
 
 void usercontrol(void){
@@ -205,6 +210,26 @@ void usercontrol(void){
         Catapult.stop();
         // set the toggle so that we don't constantly tell the motor to stop when the buttons are released
         Controller1RightShoulderControlMotorsStopped = true;
+      }
+
+      // check the buttonX status to control Pneumatics
+      if (Controller1.ButtonX.pressing()){
+        Solenoid.set(true); // pneumatic flows
+        wait(500, msec); // allows time for pneumatic to do its thing
+      }
+
+      // check buttonB status to control Pneumatics
+      if (Controller1.ButtonB.pressing()){ 
+        Solenoid.set(false); // stops flow
+        wait(500, msec); // same as above.
+      }
+
+      if (Controller1.ButtonDown.pressing()){
+        LockIt();
+      }
+
+      if (Controller1.ButtonUp.pressing()){
+        UnlockIt();
       }
     }
     // wait before repeating the process
