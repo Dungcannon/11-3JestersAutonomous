@@ -132,7 +132,7 @@ void autonomous(void){
   Forward(1000); // 1meter forward*/
   // TriggerHappy(30000); //30sec
   Catapult.spin(forward);
-  wait(5, seconds);
+  wait(20, seconds);
   Catapult.stop();
 }
 
