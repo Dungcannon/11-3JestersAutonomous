@@ -126,7 +126,11 @@ void pre_auton(void){
   Catapult.setVelocity(100, percent); // catapult shoot speed
   Catapult.setMaxTorque(100, percent); // catapult torque
   Catapult.setStopping(hold);
-  Solenoid.set(false);  
+  Solenoid.set(false); 
+  //Catapult.setPosition(-30, degrees); 
+  Catapult.spin(reverse);
+  wait(750, msec);
+  Catapult.stop();
 }
 
 void autonomous(void){
@@ -135,8 +139,12 @@ void autonomous(void){
   Forward(1000); // 1meter forward*/
   // TriggerHappy(30000); //30sec
   LockIt();
-  Catapult.spin(forward);
-  wait(20, seconds);
+ /* Solenoid.set(true);
+  wait(200,msec);
+  Solenoid.set(false);*/
+  Forward(-60);
+  Catapult.spin(reverse);
+  wait(60, seconds);
   Catapult.stop();
   UnlockIt();
 }
