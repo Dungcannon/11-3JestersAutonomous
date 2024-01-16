@@ -5,7 +5,8 @@
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
-
+#include <string>
+#include <sstream>
 
 #include "vex.h"
 
@@ -59,7 +60,8 @@ bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 #include "vex.h"
 #include <math.h> 
 #include "MiniPID.h"
- 
+
+MiniPID pid= MiniPID(0,0,0); 
 // Allows for easier use of the VEX Library
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
@@ -89,26 +91,30 @@ double ratio = 0.1; // temp ratio val
 void proportionalTurnR(int x){  //power ratio - convert degrees to volts
   double destination = x;
   double error;
-  error = destination-DrivetrainInertial.rotation(degrees);
-  LeftDriveSmart.spin(forward, error*ratio, volt);
-  RightDriveSmart.spin(reverse, error*ratio, volt);
+  error = destination-DrivetrainInertial.rotation(degrees); // if rot=170 y tar=20, err=-150 
+  
+  Brain.Screen.print("error: %1 \n rot: %2 \n tar: %3", error, 
+    DrivetrainInertial.rotation(degrees), destination);
 
+  LeftDriveSmart.spin(forward, error*ratio, volt); // Lspin -150 volt
+  RightDriveSmart.spin(reverse, error*ratio, volt); //Rspin -150 volt 
 }
 void proportionalTurnL(int x){  //power ratio - convert degrees to volts
   double destination = x;
   double error;
   error = destination-DrivetrainInertial.rotation(degrees);
+
+  Brain.Screen.print("error: %1 \n rot: %2 \n tar: %3", error, 
+    DrivetrainInertial.rotation(degrees), destination);
+    
   LeftDriveSmart.spin(reverse, error*ratio, volt);
   RightDriveSmart.spin(forward, error*ratio, volt);
 }
 
-/*void turnToP(int x){
-  //GET SENSOR
-  //SET SOME SORT TARGET
-  double output=pid.getOutput(sensor, target);
-  // do something with it 
-  delay(50);
-} base most barebones PID*/
+void getError(double init, double getVal){
+  double error = init - getVal;
+
+}
 
 //without PID
 void Forward(int x){
@@ -139,9 +145,7 @@ void autonomous(void){
   Forward(1000); // 1meter forward*/
   // TriggerHappy(30000); //30sec
   LockIt();
- /* Solenoid.set(true);
-  wait(200,msec);
-  Solenoid.set(false);*/
+  proportionalTurnR(50);
   Forward(-60);
   Catapult.spin(reverse);
   wait(60, seconds);
