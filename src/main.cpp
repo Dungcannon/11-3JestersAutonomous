@@ -21,7 +21,7 @@ brain Brain;
 motor LeftDriveSmart = motor(PORT1, ratio18_1, false);
 motor RightDriveSmart = motor(PORT2, ratio18_1, true);
 inertial DrivetrainInertial = inertial(PORT3);
-smartdrive Drivetrain = smartdrive(LeftDriveSmart, RightDriveSmart, DrivetrainInertial, 319.19, 320, 40, mm, 1);
+smartdrive Drivetrain = smartdrive(LeftDriveSmart, RightDriveSmart, DrivetrainInertial, 320, 320, 40, mm, 1);
 
 motor Harvester = motor(PORT4, ratio18_1, false);
 
@@ -61,16 +61,17 @@ bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 #include <math.h> 
 #include "MiniPID.h"
 
-MiniPID pid= MiniPID(0,0,0); 
+//MiniPID pid = MiniPID(0,0,0); //Function cannot compile |undefined reference to MiniPID::MiniPID(double, double, double)
 // Allows for easier use of the VEX Library
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
 
 void TriggerHappy(int timems) 
 {
-  Catapult.spin(forward);
+  Catapult.spin(reverse);
   wait(timems, msec);
   Catapult.stop();
+  return;
 }
 
 void LockIt(){
@@ -83,10 +84,6 @@ void UnlockIt(){
 }
 
 //Power ratio - convert degrees to volts.
-//PID
-/* MiniPID pid;
-pid = MiniPID(1,0,0); // for PID, needs a library */
-
 double ratio = 0.1; // temp ratio val
 void proportionalTurnR(int x){  //power ratio - convert degrees to volts
   double destination = x;
@@ -111,20 +108,24 @@ void proportionalTurnL(int x){  //power ratio - convert degrees to volts
   RightDriveSmart.spin(forward, error*ratio, volt);
 }
 
-void getError(double init, double getVal){
-  double error = init - getVal;
 
-}
 
 //without PID
 void Forward(int x){
   Drivetrain.driveFor(forward, x, mm);
+  return;
   
 }
-void TurnTo(int x){
-  Drivetrain.turnToHeading(x, degrees);
+
+void MotorDrive(double x, double y){
+  LeftDriveSmart.spinTo(x, degrees, false);
+  RightDriveSmart.spinTo(y, degrees);
 }
 
+void TurnTo(int x){
+  Drivetrain.turnToHeading(x, degrees);
+  return;
+}
 //-------------------- Main Functions
 
 void pre_auton(void){
@@ -141,15 +142,25 @@ void pre_auton(void){
 
 void autonomous(void){
   
-  /*proportionalTurnR(90); // attempts to turn right
-  Forward(1000); // 1meter forward*/
-  // TriggerHappy(30000); //30sec
+  DrivetrainInertial.setHeading(0, degrees);
   LockIt();
-  proportionalTurnR(50);
+  //proportionalTurnR(50);
   Forward(-60);
-  Catapult.spin(reverse);
-  wait(60, seconds);
-  Catapult.stop();
+
+  //LeftDriveSmart.setVelocity(100, percent);
+  //RightDriveSmart.setVelocity(50, percent);
+  //MotorDrive(-100,-50); 
+  // reverse 100 degrees left, reverse 50 degrees right
+  //code above needs fixing try rads? pi rad = 180deg
+
+  TriggerHappy(50000); // Shoots 50,sec
+
+  //RightDriveSmart.setVelocity(100, percent);
+  //LeftDriveSmart.setVelocity(100, percent);
+  
+  TurnTo(300); // turns via heading.
+  Forward(2200); // Goes forward after shooting. Implementation is flawed.
+
   UnlockIt();
 }
 
