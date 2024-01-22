@@ -118,8 +118,8 @@ void Forward(int x){
 }
 
 void MotorDrive(double x, double y){
-  LeftDriveSmart.spinTo(x, degrees, false);
-  RightDriveSmart.spinTo(y, degrees);
+  LeftDriveSmart.spinFor(x, degrees, false);
+  RightDriveSmart.spinFor(y, degrees, true);
 }
 
 void TurnTo(int x){
@@ -147,20 +147,13 @@ void autonomous(void){
   //proportionalTurnR(50);
   Forward(-60);
 
-  //LeftDriveSmart.setVelocity(100, percent);
-  //RightDriveSmart.setVelocity(50, percent);
-  //MotorDrive(-100,-50); 
-  // reverse 100 degrees left, reverse 50 degrees right
-  //code above needs fixing try rads? pi rad = 180deg
+  //MotorDrive(-300,-172.8); //300degree movement, 172.8 degree movement
+  // 360deg = 8pi inches.  x% of 8pi = target inch. x% of 360 = target deg
 
-  TriggerHappy(50000); // Shoots 50,sec
+  TriggerHappy(61000); // Shoots 50,seconds
 
-  //RightDriveSmart.setVelocity(100, percent);
-  //LeftDriveSmart.setVelocity(100, percent);
-  
-  TurnTo(300); // turns via heading.
-  Forward(2200); // Goes forward after shooting. Implementation is flawed.
-
+  //TurnTo(300); // turns via heading.
+  //Forward(2200); // Goes forward after shooting. Implementation is flawed.
   UnlockIt();
 }
 
