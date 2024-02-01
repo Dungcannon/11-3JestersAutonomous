@@ -7,6 +7,7 @@
 #include <string.h>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include "vex.h"
 
@@ -66,6 +67,24 @@ bool DrivetrainRNeedsToBeStopped_Controller1 = true;
 using namespace vex;
 // https://www.vexforum.com/t/user-control-and-autonomous/106690/5
 
+// Natural Functions
+
+typedef struct{
+  double current;
+	double kP;
+	double kI;
+	double kD;
+	double target;
+	double error;
+	double integral;
+	double derivative;
+	double lastError;
+	double threshold;
+	int   lastTime;
+} pid;
+
+pid sPID;
+
 void TriggerHappy(int timems) 
 {
   Catapult.spin(reverse);
@@ -81,6 +100,53 @@ void LockIt(){
 void UnlockIt(){
   LeftDriveSmart.setStopping(coast);
   RightDriveSmart.setStopping(coast);
+}
+
+//Proportional
+
+
+
+
+
+void HyprTurn(double tarVal, double tarRange){ // bad code.
+int harharhar;
+
+double highRange = tarVal + tarRange;
+double lowRange = tarVal - tarRange;
+
+bool invalid = true;
+  while (invalid){
+
+    if(DrivetrainInertial.heading(degrees) > highRange){ // 
+      harharhar = 1; // up
+    }
+    else if (DrivetrainInertial.heading(degrees) < lowRange){
+      harharhar = -1; // down
+    }
+    else{
+      harharhar = 0;
+    }
+
+    switch (harharhar){
+    case 1:
+      LeftDriveSmart.spin(reverse);
+      RightDriveSmart.spin(forward);
+      break;
+    case -1:
+      LeftDriveSmart.spin(forward);
+      RightDriveSmart.spin(reverse);
+      break;
+    case 0:
+      invalid = false;
+      break;
+    }
+    double error;
+    error = tarVal-DrivetrainInertial.heading(degrees); // if rot=170 y tar=20, err=-150 
+  
+    Controller1.Screen.print("error: %1 \n rot: %2 \n tar: %3", error, 
+    DrivetrainInertial.rotation(degrees), tarVal);
+    wait(20, msec);
+  }
 }
 
 //Power ratio - convert degrees to volts.
@@ -143,6 +209,8 @@ void pre_auton(void){
 void autonomous(void){
   
   DrivetrainInertial.setHeading(0, degrees);
+  Drivetrain.turnToHeading(270, degrees);
+  HyprTurn(270, 5);
   LockIt();
   //proportionalTurnR(50);
   Forward(-60);
